@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>개혁신당 국회의원 선거구 조직위원장 합격자</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' };</script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+    html { scroll-behavior: smooth; }
+    body {
+        font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+        background-color: #f8f9fa;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+        word-break: keep-all;
+    }
+    .dark body { background-color: #0f172a; color: #f1f5f9; }
+
+    .chip { transition: all .15s ease; }
+    .chip[data-active="true"] { background:#FF6600; color:#fff; box-shadow:0 6px 14px -4px rgba(255,102,0,.5); }
+    .chip[data-active="false"] { background:transparent; color:#94a3b8; }
+    .dark .chip[data-active="false"] { color:#64748b; }
+
+    .card { transition: transform .18s ease, box-shadow .18s ease; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 20px 30px -12px rgba(0,0,0,.12); }
+
+    ::-webkit-scrollbar { height: 6px; width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #FFB27A; border-radius: 10px; }
+</style>
+</head>
+<body class="antialiased">
+
+<!-- Header -->
+<header class="relative overflow-hidden bg-gradient-to-br from-[#FF6600] to-[#ff8a3d] text-white">
+    <div class="absolute -top-10 -right-10 w-60 h-60 rounded-full bg-white/10"></div>
+    <div class="absolute -bottom-16 -left-10 w-72 h-72 rounded-full bg-white/10"></div>
+    <div class="relative max-w-6xl mx-auto px-6 py-12 sm:py-16 text-center">
+        <img src="https://reformparty.kr/public/images/reformparty/Logo_01.svg" alt="개혁신당 로고" class="h-10 sm:h-12 mx-auto mb-4 brightness-0 invert">
+        <h1 class="text-2xl sm:text-4xl font-black leading-snug">국회의원 선거구<br class="sm:hidden"> 조직위원장 합격자</h1>
+        <p id="headerCount" class="mt-4 text-white/85 text-sm sm:text-base font-bold">전국 선거구 · 계속 추가 예정중</p>
+    </div>
+</header>
+
+<!-- Filter chips -->
+<div class="sticky top-0 z-20 bg-[#f8f9fa]/90 dark:bg-[#0f172a]/90 backdrop-blur border-b border-orange-100 dark:border-slate-800">
+    <div id="chipRow" class="max-w-6xl mx-auto px-4 py-3 flex gap-2 overflow-x-auto whitespace-nowrap"></div>
+</div>
+
+<!-- Cards -->
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div id="cardSections" class="space-y-14"></div>
+</main>
+
+<footer class="text-center text-xs text-slate-400 dark:text-slate-600 font-bold py-10">
+    개혁신당 국회의원 선거구 조직위원장 합격자 명단 · 총 <span id="footerCount"></span>명
+</footer>
+
+<script>
+const DATA = [
+  {no:1, region:"서울", city:"성동구", district:"중구·성동구 갑", name:"정찬옥", photo:"https://i.imgur.com/f9qD3on.png", gender:"남", birth:"1955", career:["제4,5대 성동구의원(재선)","제5대 성동구의회 의장(전반기)"]},
+  {no:2, region:"서울", city:"서초구", district:"서초구 갑", name:"박상혁", photo:"https://i.imgur.com/7qAnjkS.png", gender:"남", birth:"1969", career:["제11대 서울특별시의회 의원","서울시의회 교육위원회 위원장"]},
+  {no:3, region:"서울", city:"송파구", district:"송파구 을", name:"김성준", photo:"https://i.imgur.com/skK0aAX.png", gender:"남", birth:"1986", career:["개혁신당 강동(을) 사무국장","개혁신당 강동구 지역발전특위 부위원장","전) 개혁신당 서울시당 대변인","IT 스타트업 로지컬리 대표"]},
+  {no:4, region:"서울", city:"강동구", district:"강동구 을", name:"이용우", photo:"https://i.imgur.com/moDKFx9.png", gender:"남", birth:"1986", career:["전) 강동구 을 당협위원장","개혁신당 강동구 지역발전특위 위원장","21대 대선 일정기획부단장","전) 서울시당 수석대변인"]},
+  {no:5, region:"서울", city:"동작구", district:"동작구 갑", name:"김영림", photo:"https://i.imgur.com/yPigHTv.png", gender:"여", birth:"1974", career:["전) 제9대 동작구의회 의원","현) 마을발전소 사회적협동조합 활동가"]},
+  {no:6, region:"서울", city:"관악구", district:"관악구 을", name:"민영진", photo:"https://i.imgur.com/6ALhcEU.png", gender:"남", birth:"1965", career:["제7,8,9대 관악구의회 의원(3선)","제9대 관악구의회 부의장(전반기)","현) 피해자통합지원 사회적협동조합 자문위원"]},
+  {no:7, region:"대구", city:"중구·남구", district:"중구·남구", name:"진성학", photo:"https://info.nec.go.kr/photo_20260603/Gsg2700/Hb100164183/gicho/100164183.JPG?ver=2112213", gender:"남", birth:"1982", career:["진성학법률사무소 변호사","대구고등법원 국선변호인","대구지방법원 파산관재인","제20기 시험 법무사"]},
+  {no:8, region:"대구", city:"달성군", district:"달성군", name:"우성원", photo:"https://i.imgur.com/Bi2Owdi.png", gender:"남", birth:"1991", career:["전) 달성군 당협위원장","전) 달성군4-H연합회장"]},
+  {no:9, region:"인천", city:"중구·강화군·옹진군", district:"중구·강화군·옹진군", name:"장경석", photo:"https://i.imgur.com/4qGORxc.png", gender:"남", birth:"1979", career:["전) 옹진군청 정무소통비서"]},
+  {no:10, region:"대전", city:"서구", district:"서구 갑", name:"조동운", photo:"https://i.imgur.com/q8Z5Mst.png", gender:"남", birth:"1962", career:["전) 서구 을 당협위원장","전) 경찰대학 경찰학과 교수","한국경찰연구원 원장","법학박사"]},
+  {no:11, region:"세종", city:"세종시", district:"세종시 갑", name:"하헌휘", photo:"https://i.imgur.com/Z8LzmnG.png", gender:"남", birth:"1986", career:["세종특별자치시당 위원장","전) 세종시 갑 당협위원장","'변호사 하헌휘 법률사무소' 대표변호사"]},
+  {no:12, region:"세종", city:"세종시", district:"세종시 을", name:"김순주", photo:"https://i.imgur.com/55u5JPA.png", gender:"여", birth:"1973", career:["현) 해밀(산울)동 체육회 이사","현) 방송통신대 세종·공주 학생회장"]},
+  {no:13, region:"경기", city:"수원시", district:"수원시 갑", name:"정희윤", photo:"https://i.imgur.com/OuiAd60.png", gender:"남", birth:"1987", career:["전) 수원시 갑 당협위원장","경기도당 부위원장","경기도당 미래희망위원장"]},
+  {no:14, region:"경기", city:"수원시", district:"수원시 정", name:"이재형", photo:"https://i.imgur.com/B3cSmiv.png", gender:"남", birth:"1961", career:["제12대 수원시의회 의원","전) 농심 충청호남물류총괄 팀장"]},
+  {no:15, region:"경기", city:"성남시", district:"성남시 중원구", name:"김병진", photo:"https://i.imgur.com/VPIRCz2.png", gender:"남", birth:"1994", career:["개혁신당 성남시 지역발전특위 부위원장","경기도당 성남시 행정안전특위 위원장"]},
+  {no:16, region:"경기", city:"성남시", district:"성남시 분당구 갑", name:"이기인", photo:"https://i.imgur.com/xU3BBYF.png", gender:"남", birth:"1984", career:["11대 경기도의원","7,8대 성남시의원","현) 개혁신당 사무총장","전) 개혁신당 수석최고위원"]},
+  {no:17, region:"경기", city:"안산시", district:"안산시 갑", name:"문인수", photo:"https://i.imgur.com/aMOavQv.png", gender:"남", birth:"1966", career:["제5대 안산시의회 의원","현) (사)안산시 의정회 부회장","문건축사사무소 대표"]},
+  {no:18, region:"경기", city:"남양주시", district:"남양주시 을", name:"안만규", photo:"https://i.imgur.com/dtbQy8V.png", gender:"남", birth:"1954", career:["전) 남양주시 을 당협위원장","경기도당 윤리위원장","(주)남주건설 대표이사"]},
+  {no:19, region:"경기", city:"화성시", district:"화성시 정", name:"전성균", photo:"https://i.imgur.com/gc9TjpX.png", gender:"남", birth:"1990", career:["제9대 화성시의원","개혁신당 사무부총장","경기도당 위원장","전) 개혁신당 최고위원"]},
+  {no:20, region:"경기", city:"김포시", district:"김포시 갑", name:"이윤용", photo:"", gender:"남", birth:"1984", career:["현) 몰렉스코리아 책임연구원"]},
+  {no:21, region:"경기", city:"용인시", district:"용인시 정", name:"송창훈", photo:"https://i.imgur.com/czv11rh.png", gender:"남", birth:"1994", career:["전) 용인시 정 당협위원장","현) 가천대학교 기계공학부 겸임교수"]},
+  {no:22, region:"제주", city:"제주시", district:"제주시 갑", name:"이건우", photo:"https://i.imgur.com/kvf3Ifn.png", gender:"남", birth:"1993", career:["개혁신당 노형동 지역발전특별위원장","부마정치연구소장"]},
+  {no:23, region:"서울", city:"양천구", district:"양천구 갑", name:"김성열", photo:"https://i.imgur.com/JNM9vTt.png", gender:"남", birth:"1982", career:["개혁소통특별위원장","전) 개혁신당 수석최고위원","전) 개혁신당 수석대변인","전) 개혁신당 사무부총장"]},
+  {no:24, region:"충남", city:"공주시·부여군·청양군", district:"공주시·부여군·청양군", name:"이은창", photo:"https://i.imgur.com/yP4ncGr.png", gender:"남", birth:"1983", career:["충청남도당 위원장 직무대행","전)공주시·부여군·청양군 당협위원장","제6대 대전 유성구의회 의원","제21대 대선 선대위 대변인"]},
+  {no:25, region:"충북", city:"청주시", district:"청주시 청원구", name:"류근윤", photo:"https://i.imgur.com/S0tsDjf.png", gender:"남", birth:"1963", career:["현) MG우암새마을금고 이사","전) 바르게살기운동 청주시협의회장"]},
+];
+
+// 정식 광역명
+const REGION_FULL_NAME = {
+    "서울":"서울특별시", "부산":"부산광역시", "대구":"대구광역시", "인천":"인천광역시",
+    "광주":"광주광역시", "대전":"대전광역시", "울산":"울산광역시", "세종":"세종특별자치시",
+    "경기":"경기도", "강원":"강원특별자치도", "충북":"충청북도", "충남":"충청남도",
+    "전북":"전북특별자치도", "전남":"전라남도", "경북":"경상북도", "경남":"경상남도", "제주":"제주특별자치도"
+};
+
+// 시도 표준 순서: 서울 → ... → 세종 → 경기 → ... → 제주
+const REGION_ORDER = Object.keys(REGION_FULL_NAME);
+
+const presentRegions = Array.from(new Set(DATA.map(d => d.region)))
+    .sort((a, b) => REGION_ORDER.indexOf(a) - REGION_ORDER.indexOf(b));
+
+const REGIONS = ["전체", ...presentRegions];
+let activeRegion = "전체";
+
+function renderChips(){
+    const row = document.getElementById('chipRow');
+    row.innerHTML = REGIONS.map(r => {
+        const count = r === "전체" ? DATA.length : DATA.filter(d => d.region === r).length;
+        return `<button class="chip shrink-0 px-4 py-2 rounded-full text-xs sm:text-sm font-black border border-orange-200 dark:border-slate-700"
+                    data-active="${r === activeRegion}" data-region="${r}">${r} <span class="opacity-70">${count}</span></button>`;
+    }).join('');
+    row.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeRegion = btn.dataset.region;
+            renderChips();
+            renderCards();
+        });
+    });
+}
+
+function cardHTML(c){
+    const careerItems = c.career.slice(0, 4).map(item => `<li class="flex gap-1.5"><span class="text-orange-400 dark:text-orange-500">·</span><span>${item}</span></li>`).join('');
+    const genderBadge = c.gender ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold ${c.gender === '여' ? 'bg-pink-50 text-pink-600 dark:bg-pink-950/40 dark:text-pink-400' : 'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'}">${c.gender}</span>` : '';
+    const birthBadge = c.birth ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">${c.birth}년생</span>` : '';
+    return `
+        <div class="card bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-md overflow-hidden flex flex-col">
+            <div class="relative h-64 sm:h-72 bg-gray-100 dark:bg-slate-800">
+                ${c.photo
+                    ? `<img src="${c.photo}" loading="lazy" class="w-full h-full object-cover object-top" alt="${c.name} 조직위원장"
+                         onerror="this.replaceWith(Object.assign(document.createElement('div'), {className:'w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-slate-600', innerHTML:'<span class=&quot;text-xs font-black&quot;>사진 준비중</span>'}))">`
+                    : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300 dark:text-slate-600">
+                         <span class="text-xs font-black">사진 준비중</span>
+                       </div>`
+                }
+                <span class="absolute top-3 left-3 bg-[#FF6600] text-white text-[11px] font-black px-2.5 py-1 rounded-md shadow">${c.region} ${c.city}</span>
+            </div>
+
+            <div class="p-5 text-center flex flex-col flex-1">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">${c.name}</h3>
+                <div class="mt-2 flex items-center justify-center gap-1.5">
+                    ${genderBadge}
+                    ${birthBadge}
+                </div>
+                <ul class="mt-3 text-[12.5px] leading-relaxed text-slate-600 dark:text-slate-400 font-semibold text-left flex-1 space-y-1">${careerItems}</ul>
+                <div class="mt-4 w-full py-2.5 rounded-full bg-[#FF6600] text-white text-sm font-black">
+                    ${c.district} 조직위원장
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 선거구 순서 정렬: 시/도별 공식 선거구 번호 순서(예: 서울 종로구→강동구) → 갑/을/병/정/무 순
+const SUFFIX_ORDER = {"갑":1, "을":2, "병":3, "정":4, "무":5, "기":6};
+
+// 각 시/도의 공식 선거구 획정 순서(중앙선거관리위원회 고시 기준). 여기 없는 지역은 원래 배열 순서를 유지.
+const REGION_DISTRICT_ORDER = {
+    "서울": ["종로구","중구·성동구","용산구","광진구","동대문구","중랑구","성북구","강북구","도봉구","노원구","은평구","서대문구","마포구","양천구","강서구","구로구","금천구","영등포구","동작구","관악구","서초구","강남구","송파구","강동구"],
+    "대구": ["중구·남구","동구·군위군","서구","북구","수성구","달서구","달성군"],
+    "인천": ["중구·강화군·옹진군","동구·미추홀구","연수구","남동구","부평구","계양구","서구"],
+    "대전": ["동구","중구","서구","유성구","대덕구"],
+    "세종": ["세종시"],
+    "경기": ["수원시","성남시","의정부시","안양시","부천시","광명시","평택시","안산시","동두천시","양주시","연천군","고양시","의왕시","과천시","구리시","남양주시","오산시","시흥시","군포시","하남시","용인시","파주시","이천시","안성시","김포시","화성시","광주시","포천시","가평군","여주시","양평군"],
+    "제주": ["제주시","서귀포시"]
+};
+
+function getSuffixRank(district){
+    const suffix = district.trim().slice(-1);
+    return SUFFIX_ORDER[suffix] ?? 0;
+}
+
+function getRegionRank(c){
+    const order = REGION_DISTRICT_ORDER[c.region];
+    if(!order) return -1; // 정의되지 않은 지역은 원본 배열 순서를 그대로 사용(추후 stable sort로 유지)
+    const haystack = `${c.district} ${c.city}`;
+    const idx = order.findIndex(key => haystack.includes(key));
+    return idx === -1 ? order.length : idx;
+}
+
+function districtSort(a, b){
+    return getRegionRank(a) - getRegionRank(b) || (getSuffixRank(a.district) - getSuffixRank(b.district));
+}
+
+function renderCards(){
+    const container = document.getElementById('cardSections');
+    const regionsToShow = activeRegion === "전체" ? presentRegions : [activeRegion];
+
+    container.innerHTML = regionsToShow.map(region => {
+        const list = DATA.filter(d => d.region === region).sort(districtSort);
+        return `
+            <section>
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-1 h-5 bg-[#FF6600] rounded-full"></span>
+                    <h2 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">${REGION_FULL_NAME[region] || region}</h2>
+                    <span class="text-xs font-black text-orange-500 bg-orange-50 dark:bg-orange-900/30 px-2.5 py-1 rounded-full">${list.length}명</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    ${list.map(cardHTML).join('')}
+                </div>
+            </section>
+        `;
+    }).join('');
+}
+
+document.getElementById('headerCount').textContent = `전국 ${DATA.length}개 선거구 · 계속 추가 예정중`;
+document.getElementById('footerCount').textContent = DATA.length;
+
+renderChips();
+renderCards();
+</script>
+</body>
+</html>
